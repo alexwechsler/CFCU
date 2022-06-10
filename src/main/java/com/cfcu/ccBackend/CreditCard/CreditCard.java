@@ -3,63 +3,90 @@ package com.cfcu.ccBackend.CreditCard;
 import org.springframework.data.annotation.Id;
 
 public class CreditCard {
-    private final int id;
-    private final String name;
-    private final String number;
-    private final String status;
-    private final String comment;
-    private final int onOff;
+    @Id
+    private String cardId;
+    private String cardName;
+    private String maskedCardNumber;
+    private String cardStatus;
+    private String cardComment;
+    private int cardOnOff = 1;
+
+    public CreditCard() {};
 
     public CreditCard(
-        int id,
+        String id,
         String name,
         String number,
         String status,
         String comment,
-        int i
+        int onOff
     ) {
-        this.id = id;
-        this.name = name;
-        this.number = number;
-        this.status = status;
-        this.comment = comment;
-        this.onOff = i;
+        this.cardId = id;
+        this.cardName = name;
+        this.maskedCardNumber = number;
+        this.cardStatus = status;
+        this.cardComment = comment;
+        this.cardOnOff = onOff;
     }
 
-    @Id
-
-    public int getId() {
-        return id;
+    public void setCardId(String id) {
+        this.cardId = id;
     }
 
-    public String getName() {
-        return name;
+    public void setCardName(String name) {
+        this.cardName = name;
     }
 
-    public String getNumber() {
-        return number;
+    public void setMaskedCardNumber(String number) {
+        this.maskedCardNumber = number;
     }
 
-    public String getStatus() {
-        return status;
+    public void setCardStatus(String status) {
+        this.cardStatus = status;
     }
 
-    public String getComment() {
-        return comment;
+    public void setCardComment(String comment) {
+        this.cardComment = comment;
     }
 
-    public int getOnOff() {
-        return onOff;
+    public void setCardOnOff(int onOff) {
+        this.cardOnOff = onOff;
+    }
+
+
+    public String getCardId() {
+        return cardId;
+    }
+
+    public String getCardName() {
+        return cardName;
+    }
+
+    public String getMaskedCardNumber() {
+        return maskedCardNumber;
+    }
+    
+
+    public String getCardStatus() {
+        return cardStatus;
+    }
+
+    public String getCardComment() {
+        return cardComment;
+    }
+
+    public int getCardOnOff() {
+        return cardOnOff;
     }
 
     public CreditCard updateWith(CreditCard creditcard) {
         return new CreditCard(
-            this.id,
-            creditcard.name,
-            creditcard.number,
-            creditcard.status,
-            creditcard.comment,
-            creditcard.onOff
+            this.cardId,
+            creditcard.cardName,
+            creditcard.maskedCardNumber,
+            creditcard.cardStatus,
+            creditcard.cardComment,
+            creditcard.cardOnOff
         );
     }
 }

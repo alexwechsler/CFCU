@@ -5,8 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-// import java.util.Date;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +22,9 @@ public class CreditCardService {
 
     private static List<CreditCard> defaultCreditCards() {
         return List.of(
-            new CreditCard(001, "Rewards Card", "3214786590815432", "", "", 1),
-            new CreditCard(002, "Cash Back Card", "1234876509875678", "", "", 1),
-            new CreditCard(003, "Debit Card", "0987676545637657", "", "", 1)
+            new CreditCard("001", "Rewards Card", "3214786590815432", "", "", 1),
+            new CreditCard("002", "Cash Back Card", "1234876509875678", "", "", 1),
+            new CreditCard("003", "Debit Card", "0987676545637657", "", "", 1)
         );
     }
 
@@ -44,18 +42,20 @@ public class CreditCardService {
     public CreditCard create(CreditCard creditcard) {
         CreditCard copy = new CreditCard(
                 randomId(),
-                creditcard.getName(),
-                creditcard.getNumber(),
-                creditcard.getStatus(),
-                creditcard.getComment(),
-                creditcard.getOnOff()
+                creditcard.getCardName(),
+                creditcard.getMaskedCardNumber(),
+                creditcard.getCardStatus(),
+                creditcard.getCardComment(),
+                creditcard.getCardOnOff()
         );
         return repository.save(copy);
     }
 
-    public int randomId() {
+    public String randomId() {
         Random rand = new Random();
-        return rand.nextInt(50);
+        int i = rand.nextInt(50);
+        String s = String.valueOf(i);
+        return s;
     }
 
     public Optional<CreditCard> update( int id, CreditCard newCard) {

@@ -1,0 +1,25 @@
+# The Root Query for the application
+type Query {
+    CardHolder(id: Int): CardHolder
+    AllCardHolders: [CardHolder]
+}
+
+# The Root Mutation for the application
+# type Mutation {
+#     updateCreditCard(id: int!, name: String, number: String, status: String, comment: String, onOff: int) : CreditCard!
+# }
+
+# type CardHolder {
+#     id: ID
+#     name: String
+#     creditCards: [CreditCard]
+# }
+
+# type CreditCard {
+#     id: ID
+#     name: String
+#     number: String
+#     status: String
+#     comment: String
+#     onOff: int
+# }

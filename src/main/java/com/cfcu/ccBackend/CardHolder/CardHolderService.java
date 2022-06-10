@@ -24,13 +24,15 @@ public class CardHolderService {
 
     private static List<CardHolder> defaultCardHolders() {
         ArrayList creditcards = new ArrayList<CreditCard>();
-            creditcards.add(new CreditCard(001, "Rewards Card", "3214786590815432", "", "", 1));
-            creditcards.add(new CreditCard(002, "Cash Back Card", "1234876509875678", "", "", 1));
-            creditcards.add(new CreditCard(003, "Debit Card", "0987676545637657", "", "", 1));
+            creditcards.add(new CreditCard("001", "Rewards Card", "3214786590815432", "", "", 1));
+            creditcards.add(new CreditCard("002", "Cash Back Card", "1234876509875678", "", "", 1));
+            creditcards.add(new CreditCard("003", "Debit Card", "0987676545637657", "", "", 1));
 
         return List.of(
             new CardHolder(001, "Connor", creditcards),
             new CardHolder(002,"Alex", creditcards)
+            // new CardHolder(001, "Connor", creditcards),
+            // new CardHolder(002,"Alex", creditcards)
         );
     }
 
@@ -42,14 +44,18 @@ public class CardHolderService {
     }
 
     public Optional<CardHolder> find(int id) {
-        return repository.findById(id);
+        // System.out.println("Id: " + id);
+        // System.out.println("Repo:" + repository);
+        Optional<CardHolder> r = repository.findById(id);
+        // System.out.println("R:" + r);
+        return r;
     }
 
-    public CardHolder create(CardHolder creditcard) {
+    public CardHolder create(CardHolder cardHolder) {
         CardHolder copy = new CardHolder(
-                randomId(),
-                creditcard.getName(),
-                creditcard.getCreditCards()
+            randomId(), 
+            cardHolder.getName(),
+            cardHolder.getCreditCards() 
         );
         return repository.save(copy);
     }

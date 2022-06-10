@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+    <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body onload="getCardHolder()">
+    <script>
+
+        var globals = {};
+
+        function getCardHolder() {
+            const settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://localhost:8080/graphql",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "data": "{\"query\":\"query($id: Int) {\\n\\tCardHolder(id: $id) {\\n\\t\\tid\\n\\t\\tname\\n\\t\\tcreditCards {\\n\\t\\t\\tcardId\\n\\t\\t\\tcardName\\n\\t\\t\\tmaskedCardNumber\\n\\t\\t\\tcardStatus\\n\\t\\t\\tcardComment\\n\\t\\t\\tcardOnOff\\n\\t\\t\\tcardStatus\\n\\t\\t}\\n\\t}\\n}\",\"variables\":{\"id\":1}}"
+            };
+
+            $.ajax(settings).done(function (response) {
+                globals.cardHolder = response.data.CardHolder;
+                console.log(response);
+                setupCardHolder();
+            });
+        }
+
+        function setupCardHolder() {
+            let user =  globals.cardHolder.name;
+            document.getElementById('welcome').innerHTML = "<h2>Welcome To CFCU " + user + "</h2><br><br>";
+            card_area = document.getElementById('card_area');
+            let cards = globals.cardHolder.creditCards;
+            cards.forEach(createCreditCard);
+        }
+
+        function createCreditCard(card) {
+           card_area = document.getElementById('card_area');
+           html = card_area.innerHTML;
+           html += "<div id=" + card.cardId + ">";
+           html += "<ons-card onclick=\"fn.pushPage({'id': 'cardInfo.html', 'title': 'CardInfo', 'cardId': "+ card.cardId + "})\">";
+           html += "<div class=\"title\">" + card.cardName + "</div>";
+           html += "<div class=\"content\">" + card.maskedCardNumber + "</div>";
+           html += "</ons-card>";
+           html += "</div>";
+           card_area.innerHTML = html;
+           // card_area.innerHTML.style.backgroundcolor = "#62c468";
+        }
+
+
+
+        window.fn = {};
+        
+        window.fn.toggleMenu = function () {
+        document.getElementById('appSplitter').right.toggle();
+        };
+
+        window.fn.loadView = function (index) {
+        document.getElementById('appTabbar').setActiveTab(index);
+        document.getElementById('sidemenu').close();
+        };
+
+        window.fn.loadLink = function (url) {
+        window.open(url, '_blank');
+        };
+
+        window.fn.pushPage = function (page, anim) {
+        if (anim) {
+            document.getElementById('appNavigator').pushPage(page.id, { data: { title: page.title, cardId: page.cardId }, animation: anim });
+        } else {
+            document.getElementById('appNavigator').pushPage(page.id, { data: { title: page.title, cardId: page.cardId  } });
+        }
+        };
+    </script>
+
+    <ons-navigator id="appNavigator" swipeable swipe-target-width="80px">
+        <ons-page>
+          <ons-splitter id="appSplitter">
+            <ons-splitter-side id="sidemenu" page="sidemenu.html" swipeable side="right" collapse="" width="260px"></ons-splitter-side>
+            <ons-splitter-content page="tabbar.html"></ons-splitter-content>
+          </ons-splitter>
+        </ons-page>
+      </ons-navigator>
+      
+      <template id="tabbar.html">
+        <ons-page id="tabbar-page">
+          <ons-toolbar>
+            <div class="center">Home</div>
+            <div class="right">
+              <ons-toolbar-button onclick="fn.toggleMenu()">
+                <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
+              </ons-toolbar-button>
+            </div>
+          </ons-toolbar>
+          <ons-tabbar swipeable id="appTabbar" position="auto">
+            <ons-tab label="Home" icon="ion-ios-home" page="home.html" active></ons-tab>
+          </ons-tabbar>
+      
+          <script>
+            ons.getScriptPage().addEventListener('prechange', function(event) {
+              if (event.target.matches('#appTabbar')) {
+                event.currentTarget.querySelector('ons-toolbar .center').innerHTML = event.tabItem.getAttribute('label');
+              }
+            });
+          </script>
+        </ons-page>
+      </template>
+
+      <template id="sidemenu.html"></template>
+      
+      <template id="home.html">
+        <ons-page>
+          <p class="intro" id="welcome">
+
+          </p>
+          <div id="card_area"></div>
+      
+          <style>
+            .intro {
+              text-align: center;
+              padding: 0 20px;
+              margin-top: 40px;
+            }
+      
+            ons-card {
+              cursor: pointer;
+              color: #333;
+            }
+      
+            .card__title,
+            .card--material__title {
+              font-size: 20px;
+            }
+          </style>
+        </ons-page>
+      </template>
+      
+      <template id="cardInfo.html">
+          <ons-page id="cardInfo-page">
+              <ons-toolbar>
+                  <div class="left">
+                    <ons-back-button>Home</ons-back-button>
+                  </div>
+                  <div class="center"></div>
+              </ons-toolbar>
+
+              <div class="card">
+                <!-- <img src="img_avatar.png" alt="Avatar" style="width:100%"> -->
+                <div class="container">
+                  <h4 id="cardName"><b>Card Name</b></h4>
+                  <div id="cardNumber">
+                    <p>Masked Card Number</p>
+                  </div>
+                </div>
+              </div> 
+
+              <!-- console.log(nav.getCurrentPage().options.value); -->
+
+              <ons-list-header>Enable Card Use</ons-list-header>
+              <ons-list-item>
+                <label class="center" for="switch1">
+                  Card<span id="switch-status">&nbsp;(on)</span>
+                </label>
+                <div class="right">
+                  <ons-switch id="model-switch" input-id="switch1" checked="true"></ons-switch>
+                </div>
+              </ons-list-item>
+
+            <ons-list-header>Please Enter Brief Description</ons-list-header>
+            <ons-list-item class="input-items">
+              <div class="left">
+                <ons-icon icon="fa-file" class="list-item__icon"></ons-icon>
+              </div>
+              <label class="center">
+              <ons-input id="name-input" float maxlength="80" placeholder="Summary"></ons-input>
+            </label>
+            </ons-list-item>
+
+              <ons-list-header>Please Select Issue</ons-list-header>
+              <ons-list-item>
+                <div class="center">
+                  <ons-select id="select-input" style="width: 120px">
+                    <option value="Lost">
+                      Lost
+                    </option>
+                    <option value="Damaged">
+                      Damaged
+                    </option>
+                    <option value="Stolen">
+                      Stolen
+                    </option>
+                  </ons-select>
+        
+                </div>
+                <div class="right right-label">
+                  <span id="awesome-platform">Lost&nbsp;</span>
+                </div>
+              </ons-list-item>
+
+              <section style="margin: 16px">
+                <ons-button modifier="large" class="button-margin" enabled>Submit</ons-button>
+              </section>
+
+
+
+              <script>
+                function pad(num, size) {
+                    num = num.toString();
+                    while (num.length < size) num = "0" + num;
+                    return num;
+                }
+
+                ons.getScriptPage().onInit = function () {
+                  cardId = this.data.cardId;
+                  let card = globals.cardHolder.creditCards.find(c => c.cardId === pad(cardId,4));
+                  
+                  document.getElementById('cardName').innerHTML = card.cardName;
+                  document.getElementById('cardNumber').innerHTML = card.maskedCardNumber;
+
+
+                  if (ons.platform.isAndroid()) {
+                    const inputItems = document.querySelectorAll('.input-items');
+                    for (i = 0; i < inputItems.length; i++) {
+                      inputItems[i].hasAttribute('modifier') ?
+                        inputItems[i].setAttribute('modifier', inputItems[i].getAttribute('modifier') + ' nodivider') :
+                        inputItems[i].setAttribute('modifier', 'nodivider');
+                    }
+                  }
+                  document.getElementById('model-switch').addEventListener('change', function (event) {
+                    if (event.value) {
+                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
+                      document.getElementById('enabled-label').innerHTML = `Enabled switch`;
+                      document.getElementById('disabled-switch').disabled = false;
+                    } else {
+                      document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
+                      document.getElementById('enabled-label').innerHTML = `Disabled switch`;
+                      document.getElementById('disabled-switch').disabled = true;
+                    }
+                  });
+
+                    document.getElementById('model-switch').addEventListener('change', function (event) {
+                    if (event.value) {
+                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
+                      document.getElementById('enabled-label').innerHTML = `Enabled switch`;
+                      document.getElementById('disabled-switch').disabled = false;
+                    } else {
+                      document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
+                      document.getElementById('enabled-label').innerHTML = `Disabled switch`;
+                      document.getElementById('disabled-switch').disabled = true;
+                    }
+                  });
+                  document.getElementById('select-input').addEventListener('change', function (event) {
+                  document.getElementById('awesome-platform').innerHTML = `${event.target.value}&nbsp;`;
+                  });
+
+                  var nameInput = document.getElementById('name-input');
+                  var updateInputs = function (event) {
+                    nameInput.value = event.target.value;
+                    searchInput.value = event.target.value;
+                    document.getElementById('name-display').innerHTML = event.target.value !== '' ? `Hello ${event.target.value}!` : 'Hello anonymous!';
+                  }
+                  nameInput.addEventListener('input', updateInputs);
+                }
+              </script>
+          
+              <style>
+                .right-icon {
+                  margin-left: 10px;
+                }
+          
+                .right-label {
+                  color: #666;
+                }
+              </style>
+          </ons-page>
+      </template>
+      
+
+      <style>
+        ons-splitter-side[animation=overlay] {
+          border-left: 1px solid #bbb;
+        }
+      </style>
+</body>
+</html>

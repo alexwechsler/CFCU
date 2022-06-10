@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -20,14 +22,20 @@ public class CardHolderController {
 
     @GetMapping
     public ResponseEntity<List<CardHolder>> findAll() {
-        List<CardHolder> items = service.findAll();
-        return ResponseEntity.ok().body(items);
+        List<CardHolder> CardHolders = service.findAll();
+        return ResponseEntity.ok().body(CardHolders);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CardHolder> find(@PathVariable("id") int id) {
-        Optional<CardHolder> item = service.find(id);
-        return ResponseEntity.of(item);
+        // CardHolder CardHolder = service.find(id);
+        Optional<CardHolder> CardHolder = service.find(id);
+        CardHolder returnCardHolder = null;
+        if(CardHolder.isPresent()) {
+            returnCardHolder = CardHolder.get();
+        } 
+        return ResponseEntity.ok().body(returnCardHolder);
+        //return ResponseEntity.of(CardHolder);
     }
     
 }

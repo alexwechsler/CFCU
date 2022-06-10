@@ -1,0 +1,5 @@
+type CardHolder {
+    id: Int
+    name: String
+    creditCards: [CreditCard]
+}

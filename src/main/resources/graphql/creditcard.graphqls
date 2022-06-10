@@ -1,0 +1,8 @@
+type CreditCard {
+    cardId: String
+    cardName: String
+    maskedCardNumber: String
+    cardStatus: String
+    cardComment: String
+    cardOnOff: Int
+}
