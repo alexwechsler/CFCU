@@ -168,7 +168,7 @@
                   Card<span id="switch-status">&nbsp;(on)</span>
                 </label>
                 <div class="right">
-                  <ons-switch id="model-switch" input-id="switch1" checked="true"></ons-switch>
+                  <ons-switch id="model-switch" input-id="switch1"></ons-switch>
                 </div>
               </ons-list-item>
 
@@ -222,6 +222,14 @@
                   
                   document.getElementById('cardName').innerHTML = card.cardName;
                   document.getElementById('cardNumber').innerHTML = card.maskedCardNumber;
+                  
+                  if (card.cardOnOff) {
+                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
+                      document.getElementById('model-switch').checked = true;
+                  } else {
+                    document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
+                    document.getElementById('model-switch').checked = false;
+                  }
 
 
                   if (ons.platform.isAndroid()) {
@@ -233,28 +241,17 @@
                     }
                   }
                   document.getElementById('model-switch').addEventListener('change', function (event) {
-                    if (event.value) {
-                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
-                      document.getElementById('enabled-label').innerHTML = `Enabled switch`;
-                      document.getElementById('disabled-switch').disabled = false;
-                    } else {
+                    if (card.cardOnOff) {
                       document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
-                      document.getElementById('enabled-label').innerHTML = `Disabled switch`;
-                      document.getElementById('disabled-switch').disabled = true;
+                      document.getElementById('model-switch').checked = false;
+                      card.cardOnOff = 0;
+                    } else {
+                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
+                      document.getElementById('model-switch').checked = true;
+                      card.cardOnOff = 1;
                     }
                   });
 
-                    document.getElementById('model-switch').addEventListener('change', function (event) {
-                    if (event.value) {
-                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
-                      document.getElementById('enabled-label').innerHTML = `Enabled switch`;
-                      document.getElementById('disabled-switch').disabled = false;
-                    } else {
-                      document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
-                      document.getElementById('enabled-label').innerHTML = `Disabled switch`;
-                      document.getElementById('disabled-switch').disabled = true;
-                    }
-                  });
                   document.getElementById('select-input').addEventListener('change', function (event) {
                   document.getElementById('awesome-platform').innerHTML = `${event.target.value}&nbsp;`;
                   });
