@@ -71,6 +71,7 @@
         };
 
         window.fn.pushPage = function (page, anim) {
+          // debugger;
         if (anim) {
             document.getElementById('appNavigator').pushPage(page.id, { data: { title: page.title, cardId: page.cardId }, animation: anim });
         } else {
@@ -160,15 +161,13 @@
                 </div>
               </div> 
 
-              <!-- console.log(nav.getCurrentPage().options.value); -->
-
               <ons-list-header>Enable Card Use</ons-list-header>
               <ons-list-item>
                 <label class="center" for="switch1">
-                  Card<span id="switch-status">&nbsp;(on)</span>
+                  Card<span id="onOff-status">&nbsp;(on)</span>
                 </label>
                 <div class="right">
-                  <ons-switch id="model-switch" input-id="switch1"></ons-switch>
+                  <ons-switch id="onOff-switch" input-id="switch1"></ons-switch>
                 </div>
               </ons-list-item>
 
@@ -178,14 +177,14 @@
                 <ons-icon icon="fa-file" class="list-item__icon"></ons-icon>
               </div>
               <label class="center">
-              <ons-input id="name-input" float maxlength="80" placeholder="Summary"></ons-input>
+              <ons-input id="card-comment" float maxlength="80" placeholder="Summary"></ons-input>
             </label>
             </ons-list-item>
 
               <ons-list-header>Please Select Issue</ons-list-header>
               <ons-list-item>
                 <div class="center">
-                  <ons-select id="select-input" style="width: 120px">
+                  <ons-select id="card-issue" style="width: 120px">
                     <option value="Lost">
                       Lost
                     </option>
@@ -199,7 +198,7 @@
         
                 </div>
                 <div class="right right-label">
-                  <span id="awesome-platform">Lost&nbsp;</span>
+                  <span id="status-confirm"></span>
                 </div>
               </ons-list-item>
 
@@ -216,21 +215,28 @@
                     return num;
                 }
 
-                ons.getScriptPage().onInit = function () {
-                  cardId = this.data.cardId;
+                function init(cardId){
                   let card = globals.cardHolder.creditCards.find(c => c.cardId === pad(cardId,4));
-                  
                   document.getElementById('cardName').innerHTML = card.cardName;
                   document.getElementById('cardNumber').innerHTML = card.maskedCardNumber;
-                  
-                  if (card.cardOnOff) {
-                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
-                      document.getElementById('model-switch').checked = true;
-                  } else {
-                    document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
-                    document.getElementById('model-switch').checked = false;
+                  document.getElementById('card-comment').value = card.cardComment;
+                  document.getElementById('card-issue').value = card.cardStatus;
+                  if (card.cardStatus != null) {
+                    document.getElementById('status-confirm').innerHTML  = `${card.cardStatus}&nbsp;`;
                   }
 
+                  if (card.cardOnOff) {
+                      document.getElementById('onOff-status').innerHTML = `&nbsp;(on)`;
+                      document.getElementById('onOff-switch').checked = true;
+                  } else {
+                    document.getElementById('onOff-status').innerHTML = `&nbsp;(off)`;
+                    document.getElementById('onOff-switch').checked = false;
+                  }
+                  return card;
+                }
+
+                ons.getScriptPage().onInit = function () {                  
+                  card = init(this.data.cardId); // Get & Set current values...
 
                   if (ons.platform.isAndroid()) {
                     const inputItems = document.querySelectorAll('.input-items');
@@ -240,29 +246,28 @@
                         inputItems[i].setAttribute('modifier', 'nodivider');
                     }
                   }
-                  document.getElementById('model-switch').addEventListener('change', function (event) {
+                  document.getElementById('onOff-switch').addEventListener('change', function (event) {
                     if (card.cardOnOff) {
-                      document.getElementById('switch-status').innerHTML = `&nbsp;(off)`;
-                      document.getElementById('model-switch').checked = false;
+                      document.getElementById('onOff-status').innerHTML = `&nbsp;(off)`;
+                      document.getElementById('onOff-switch').checked = false;
                       card.cardOnOff = 0;
                     } else {
-                      document.getElementById('switch-status').innerHTML = `&nbsp;(on)`;
-                      document.getElementById('model-switch').checked = true;
+                      document.getElementById('onOff-status').innerHTML = `&nbsp;(on)`;
+                      document.getElementById('onOff-switch').checked = true;
                       card.cardOnOff = 1;
                     }
                   });
 
-                  document.getElementById('select-input').addEventListener('change', function (event) {
-                  document.getElementById('awesome-platform').innerHTML = `${event.target.value}&nbsp;`;
+                  document.getElementById('card-issue').addEventListener('change', function (event) {
+                    card.cardStatus = event.target.value;  
+                    document.getElementById('status-confirm').innerHTML = `${event.target.value}&nbsp;`;
                   });
 
-                  var nameInput = document.getElementById('name-input');
+                  var cardCommentField = document.getElementById('card-comment');
                   var updateInputs = function (event) {
-                    nameInput.value = event.target.value;
-                    searchInput.value = event.target.value;
-                    document.getElementById('name-display').innerHTML = event.target.value !== '' ? `Hello ${event.target.value}!` : 'Hello anonymous!';
+                    card.cardComment = event.target.value;
                   }
-                  nameInput.addEventListener('input', updateInputs);
+                  cardCommentField.addEventListener('input', updateInputs);
                 }
               </script>
           
