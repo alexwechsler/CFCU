@@ -4,24 +4,27 @@ import org.springframework.data.annotation.Id;
 
 public class CreditCard {
     @Id
-    private String cardId;
+    private Integer cardId;
+    private Long cardHolderId;
     private String cardName;
     private String maskedCardNumber;
     private String cardStatus;
     private String cardComment;
-    private int cardOnOff = 1;
+    private Boolean cardOnOff = true;
 
     public CreditCard() {};
 
     public CreditCard(
-        String id,
+        Integer id,
+        Long cardHolderId,
         String name,
         String number,
         String status,
         String comment,
-        int onOff
+        Boolean onOff
     ) {
         this.cardId = id;
+        this.cardHolderId = cardHolderId;
         this.cardName = name;
         this.maskedCardNumber = number;
         this.cardStatus = status;
@@ -29,8 +32,12 @@ public class CreditCard {
         this.cardOnOff = onOff;
     }
 
-    public void setCardId(String id) {
+    public void setCardId(Integer id) {
         this.cardId = id;
+    }
+
+    public void setCardHolderId(Long cardHolderId) {
+        this.cardHolderId = cardHolderId;
     }
 
     public void setCardName(String name) {
@@ -49,13 +56,17 @@ public class CreditCard {
         this.cardComment = comment;
     }
 
-    public void setCardOnOff(int onOff) {
+    public void setCardOnOff(Boolean onOff) {
         this.cardOnOff = onOff;
     }
 
 
-    public String getCardId() {
+    public Integer getCardId() {
         return cardId;
+    }
+
+    public Long getCardHolderId() {
+        return cardHolderId;
     }
 
     public String getCardName() {
@@ -75,13 +86,14 @@ public class CreditCard {
         return cardComment;
     }
 
-    public int getCardOnOff() {
+    public Boolean getCardOnOff() {
         return cardOnOff;
     }
 
     public CreditCard updateWith(CreditCard creditcard) {
         return new CreditCard(
             this.cardId,
+            creditcard.cardHolderId,
             creditcard.cardName,
             creditcard.maskedCardNumber,
             creditcard.cardStatus,

@@ -1,6 +1,8 @@
 package com.cfcu.ccBackend.CardHolder;
 
-import com.cfcu.ccBackend.CreditCard.CreditCard;
+// import com.cfcu.ccBackend.CreditCard.CreditCard;
+import com.cfcu.ccBackend.CreditCard.CreditCardService;
+
 import org.springframework.data.map.repository.config.EnableMapRepositories;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -16,31 +18,35 @@ import java.util.Random;
 
 public class CardHolderService {
     private final CrudRepository<CardHolder, Integer> repository;
+    private CreditCardService cardService;
 
-    public CardHolderService(CrudRepository<CardHolder, Integer> repository) {
+    public CardHolderService(CrudRepository<CardHolder, Integer> repository, CreditCardService cardService) {
         this.repository = repository;
-        this.repository.saveAll(defaultCardHolders());
+        this.cardService = cardService;
+        // this.repository.saveAll(defaultCardHolders());
     }
 
-    private static List<CardHolder> defaultCardHolders() {
-        ArrayList creditcards = new ArrayList<CreditCard>();
-            creditcards.add(new CreditCard("001", "Rewards Card", "3214786590815432", "", "", 1));
-            creditcards.add(new CreditCard("002", "Cash Back Card", "1234876509875678", "", "", 1));
-            creditcards.add(new CreditCard("003", "Debit Card", "0987676545637657", "", "", 1));
+    // private static List<CardHolder> defaultCardHolders() {
+    //     ArrayList creditcards = new ArrayList<CreditCard>();
+    //         creditcards.add(new CreditCard(001, "Rewards Card", "3214786590815432", "", "", true));
+    //         creditcards.add(new CreditCard(002, "Cash Back Card", "1234876509875678", "", "", true));
+    //         creditcards.add(new CreditCard(003, "Debit Card", "0987676545637657", "", "", true));
 
-        return List.of(
-            new CardHolder(001, "Connor", creditcards),
-            new CardHolder(002,"Alex", creditcards)
-            // new CardHolder(001, "Connor", creditcards),
-            // new CardHolder(002,"Alex", creditcards)
-        );
-    }
+    //     return List.of(
+    //         new CardHolder(001, "Connor", creditcards),
+    //         new CardHolder(002,"Alex", creditcards)
+    //     );
+    // }
 
     public List<CardHolder> findAll() {
         List<CardHolder> list = new ArrayList<>();
         Iterable<CardHolder> items = repository.findAll();
         items.forEach(list::add);
         return list;
+    }
+
+    public int count(){
+        return (int)repository.count();
     }
 
     public Optional<CardHolder> find(int id) {
@@ -53,12 +59,22 @@ public class CardHolderService {
 
     public CardHolder create(CardHolder cardHolder) {
         CardHolder copy = new CardHolder(
-            randomId(), 
+            cardHolder.getId(), 
             cardHolder.getName(),
+            cardHolder.getCardService(),
             cardHolder.getCreditCards() 
         );
+        // List<CreditCard> cards = cardHolder.getCreditCards();
+        // cards.forEach((card) -> {
+        //     cardService.create(card);
+        // });
         return repository.save(copy);
     }
+
+    // public CreditCard[] getCards(long cardHolderId) {
+    //     CreditCard[] cards = cardService.findByCardHolder(cardHolderId);
+    //     return cards;
+    // }
 
     public int randomId() {
         Random rand = new Random();

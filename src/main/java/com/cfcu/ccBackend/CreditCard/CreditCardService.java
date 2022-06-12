@@ -17,15 +17,6 @@ public class CreditCardService {
 
     public CreditCardService(CrudRepository<CreditCard, Integer> repository) {
         this.repository = repository;
-        this.repository.saveAll(defaultCreditCards());
-    }
-
-    private static List<CreditCard> defaultCreditCards() {
-        return List.of(
-            new CreditCard("001", "Rewards Card", "3214786590815432", "", "", 1),
-            new CreditCard("002", "Cash Back Card", "1234876509875678", "", "", 1),
-            new CreditCard("003", "Debit Card", "0987676545637657", "", "", 1)
-        );
     }
 
     public List<CreditCard> findAll() {
@@ -41,7 +32,8 @@ public class CreditCardService {
 
     public CreditCard create(CreditCard creditcard) {
         CreditCard copy = new CreditCard(
-                randomId(),
+                creditcard.getCardId(),
+                creditcard.getCardHolderId(),
                 creditcard.getCardName(),
                 creditcard.getMaskedCardNumber(),
                 creditcard.getCardStatus(),
@@ -51,15 +43,27 @@ public class CreditCardService {
         return repository.save(copy);
     }
 
-    public String randomId() {
+    // Dont' like this, but don't have another method to do a 
+    // findBy using a different field...
+    public List<CreditCard> findByCardHolder(Long id) {
+        List<CreditCard> cards = findAll();
+        CreditCard[] cardArray = cards.toArray(new CreditCard[0]);
+        ArrayList<CreditCard> cardList = new ArrayList<>();
+        for (int i = 0; i < cardArray.length; i++) {
+            if (cardArray[i].getCardHolderId() == id) {
+                cardList.add(cardArray[i]);
+            }
+        }
+        return cardList;
+    }
+
+    public Integer randomId() {
         Random rand = new Random();
         int i = rand.nextInt(50);
-        String s = String.valueOf(i);
-        return s;
+        return i;
     }
 
     public Optional<CreditCard> update( int id, CreditCard newCard) {
-        // Only update an item if it can be found first.
         return repository.findById(id)
                 .map(oldItem -> {
                     CreditCard updated = oldItem.updateWith(newCard);

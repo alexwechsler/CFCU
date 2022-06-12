@@ -2,32 +2,34 @@ package com.cfcu.ccBackend.CardHolder;
 
 import org.springframework.data.annotation.Id;
 
+import com.cfcu.ccBackend.CreditCard.CreditCard;
+import com.cfcu.ccBackend.CreditCard.CreditCardService;
+
+import java.util.ArrayList;
 import java.util.List;
 
-// import javax.annotation.Generated;
-// import javax.persistence.Entity;
-// import javax.persistence.GeneratedValue;
-
-// import static javax.persistence.GenerationType.AUTO;
-
-// @Entity
 public class CardHolder {
+    private CreditCardService cardService;
+    
     @Id
-    // @GeneratedValue
     private int id;
     private String name;
-    private List creditCards;
+    private List<CreditCard> creditCards = new ArrayList<CreditCard>();
+    
 
     public CardHolder() {};
 
     public CardHolder(        
         int id,
         String name,
-        List creditCards
+        CreditCardService cardService,
+        CreditCard[] creditCards
     ) {
         this.id = id;
         this.name = name;
-        this.creditCards = creditCards;
+        this.cardService = cardService;
+        this.setCreditCards(creditCards);
+        // this.creditCards = Arrays.asList(creditCards);
     }
 
     public void setName(String name) {
@@ -38,8 +40,17 @@ public class CardHolder {
         this.id = id;
     }
 
-    public void setCreditCards(List creditCards) {
-        this.creditCards = creditCards;
+    public void setCreditCards(CreditCard[] cardlist) {
+        for(int i = 0; i < cardlist.length; i++) {
+            cardlist[i].setCardHolderId((long)this.getId()); 
+            CreditCard card = cardService.create(cardlist[i]);
+            this.creditCards.add(card);
+         }
+        
+    }
+
+    public CreditCardService getCardService(){
+        return cardService;
     }
 
     public int getId() {
@@ -50,15 +61,18 @@ public class CardHolder {
         return name;
     }
 
-    public List getCreditCards() {
-        return creditCards;
+    public CreditCard[] getCreditCards() {
+        List<CreditCard> creditCards = cardService.findByCardHolder((long) this.getId());
+        return creditCards.toArray(new CreditCard[0]);
+        // return this.creditCards.toArray(new CreditCard[0]);
     }
 
     public CardHolder updateWith(CardHolder cardholder) {
         return new CardHolder(
             this.id,
             cardholder.name,
-            cardholder.creditCards
+            cardholder.cardService,
+            cardholder.getCreditCards()
         );
     }
 }

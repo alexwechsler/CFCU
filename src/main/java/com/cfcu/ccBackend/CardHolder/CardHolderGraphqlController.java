@@ -1,6 +1,6 @@
 package com.cfcu.ccBackend.CardHolder;
 
-import java.util.List;
+
 
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -9,37 +9,42 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
 
 import java.io.IOException;
-import java.util.Arrays;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpMethod;
 
 import org.springframework.web.client.RestTemplate;
 
 import com.cfcu.ccBackend.CreditCard.CreditCard;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
+import com.cfcu.ccBackend.CreditCard.CreditCardService;
 
 @Controller
 public class CardHolderGraphqlController {
     private final CardHolderService service;
+    private CreditCardService cardService;
 
-    public CardHolderGraphqlController(CardHolderService service) {
+    public CardHolderGraphqlController(CardHolderService service, CreditCardService cardService) {
       this.service = service;
-    }
-
-    @QueryMapping
-    public List<CardHolder> AllCardHolders() {   
-        String uri = "http://localhost:8080/cardinfo";
-        RestTemplate restTemplate = new RestTemplate();
-        List <CardHolder> result = restTemplate.getForObject(uri, List.class);
-        return result;
+      this.cardService = cardService;
     }
 
     @QueryMapping
     public CardHolder CardHolder(@Argument Integer id) throws IOException {
+        CardHolder result = null;
 
+        if(service.count() == 0) {
+            result = initCardHolder(id);
+        } else {
+            result = service.find(id).get();
+        }
+        return result;
+    }
+
+    private CardHolder initCardHolder(int id) throws JsonMappingException, JsonProcessingException {
         String uri = "https://anypoint.mulesoft.com/mocking/api/v1/links/2107a7ca-f0f9-4894-93f3-a6f18e9c9f63/cardInfo/" + id;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -56,14 +61,13 @@ public class CardHolderGraphqlController {
         System.out.println(cardArrayNode.toString());
         CreditCard[] cardlist = mapper.readValue(cardArrayNode.toString(), CreditCard[].class);
 
-
-        CardHolder result = new CardHolder(
-            001, 
-            jsonNode.get("cardHolder").asText(), 
-            Arrays.asList(cardlist)
+        CardHolder cardHolder = new CardHolder(
+            service.count() + 1, 
+            jsonNode.get("cardHolder").asText(),
+            cardService,
+            cardlist
         );
-        service.create(result);
-        List<CardHolder> t = service.findAll();
-        return result;
+        service.create(cardHolder);
+        return cardHolder;
     }
 }

@@ -1,4 +1,4 @@
-type CreditCard {
+input CreditCardInput {
     cardId: Int
     cardName: String
     maskedCardNumber: String

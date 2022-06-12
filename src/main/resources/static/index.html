@@ -12,8 +12,14 @@
     <script>
 
         var globals = {};
-
+        
         function getCardHolder() {
+          var CardUserId = 1;
+          var data_query = "{\"query\":\"query($id: Int) \
+                          {CardHolder(id: $id) \
+                          {id name creditCards \
+                          { cardId cardName maskedCardNumber cardStatus cardComment cardOnOff cardStatus}}}\", \
+                          \"variables\":{\"id\":" + CardUserId + "}}";
             const settings = {
             "async": true,
             "crossDomain": true,
@@ -22,17 +28,54 @@
             "headers": {
                 "Content-Type": "application/json"
             },
-            "data": "{\"query\":\"query($id: Int) {\\n\\tCardHolder(id: $id) {\\n\\t\\tid\\n\\t\\tname\\n\\t\\tcreditCards {\\n\\t\\t\\tcardId\\n\\t\\t\\tcardName\\n\\t\\t\\tmaskedCardNumber\\n\\t\\t\\tcardStatus\\n\\t\\t\\tcardComment\\n\\t\\t\\tcardOnOff\\n\\t\\t\\tcardStatus\\n\\t\\t}\\n\\t}\\n}\",\"variables\":{\"id\":1}}"
+            "data": data_query
             };
 
             $.ajax(settings).done(function (response) {
                 globals.cardHolder = response.data.CardHolder;
+                // setupCardHolder();
                 console.log(response);
-                setupCardHolder();
+            }).fail(function (response) {
+                globals.cardHolder = response.data.CardHolder;
             });
         }
 
+        function updateCreditCard(card){
+          var onOff = true;
+          if (card.cardOnOff == 0 ) {
+            onOff = false;
+          }
+          var card_update_mutation = "{\"query\":\"mutation{updateCreditCard(\
+                                      id:" + card.cardId + " \
+                                      name: \\\"" + card.cardName + "\\\" \
+                                      onOff: " + onOff + " \
+                                      status: \\\""+ card.cardStatus + "\\\" \
+                                      comment: \\\""+ card.cardComment +"\\\" \
+                                      number: \\\""+ card.maskedCardNumber + "\\\")}\"}"
+          const settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://localhost:8080/graphql",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "data": card_update_mutation
+        };
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+        });
+        }
+
         function setupCardHolder() {
+          // Doing this to handle a race condition where the 
+          // GQL occurs prior to completely rendering the page...
+            if (globals.cardHolder == null) {
+              // console.log("RACE CONDITION... HELP");
+              location.reload();
+              // try again
+            }
             let user =  globals.cardHolder.name;
             document.getElementById('welcome').innerHTML = "<h2>Welcome To CFCU " + user + "</h2><br><br>";
             card_area = document.getElementById('card_area');
@@ -49,21 +92,26 @@
            html += "<div class=\"content\">" + card.maskedCardNumber + "</div>";
            html += "</ons-card>";
            html += "</div>";
+           html += "<style>.card {background-image: url(cfcu_card2.jpg);";
+           html += "display:block;";
+           html += "background-size: cover;";
+           html += "height: 200px;";
+           html += "width 400px;";
+           html +="}</style>";
            card_area.innerHTML = html;
            // card_area.innerHTML.style.backgroundcolor = "#62c468";
         }
 
-
-
         window.fn = {};
         
-        window.fn.toggleMenu = function () {
-        document.getElementById('appSplitter').right.toggle();
-        };
+        // window.fn.toggleMenu = function () {
+        // document.getElementById('appSplitter').right.toggle();
+        // };
 
         window.fn.loadView = function (index) {
         document.getElementById('appTabbar').setActiveTab(index);
-        document.getElementById('sidemenu').close();
+        
+        // document.getElementById('sidemenu').close();
         };
 
         window.fn.loadLink = function (url) {
@@ -71,7 +119,6 @@
         };
 
         window.fn.pushPage = function (page, anim) {
-          // debugger;
         if (anim) {
             document.getElementById('appNavigator').pushPage(page.id, { data: { title: page.title, cardId: page.cardId }, animation: anim });
         } else {
@@ -83,18 +130,20 @@
     <ons-navigator id="appNavigator" swipeable swipe-target-width="80px">
         <ons-page>
           <ons-splitter id="appSplitter">
-            <ons-splitter-side id="sidemenu" page="sidemenu.html" swipeable side="right" collapse="" width="260px"></ons-splitter-side>
+            <!-- <ons-splitter-side id="sidemenu" page="sidemenu.html" swipeable side="right" collapse="" width="260px"></ons-splitter-side> -->
             <ons-splitter-content page="tabbar.html"></ons-splitter-content>
           </ons-splitter>
         </ons-page>
       </ons-navigator>
       
+      <!-- <p class="intro" id="welcome"></p> -->
+
       <template id="tabbar.html">
         <ons-page id="tabbar-page">
           <ons-toolbar>
             <div class="center">Home</div>
             <div class="right">
-              <ons-toolbar-button onclick="fn.toggleMenu()">
+              <ons-toolbar-button >
                 <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
               </ons-toolbar-button>
             </div>
@@ -113,13 +162,9 @@
         </ons-page>
       </template>
 
-      <template id="sidemenu.html"></template>
-      
       <template id="home.html">
         <ons-page>
-          <p class="intro" id="welcome">
-
-          </p>
+          <p class="intro" id="welcome"></p>
           <div id="card_area"></div>
       
           <style>
@@ -139,9 +184,14 @@
               font-size: 20px;
             }
           </style>
+          <script>
+             setupCardHolder();
+          </script>
         </ons-page>
       </template>
-      
+
+      <!-- <template id="sidemenu.html"></template>       -->
+
       <template id="cardInfo.html">
           <ons-page id="cardInfo-page">
               <ons-toolbar>
@@ -203,20 +253,19 @@
               </ons-list-item>
 
               <section style="margin: 16px">
-                <ons-button modifier="large" class="button-margin" enabled>Submit</ons-button>
+                <ons-button id="submit-btn" ripple ="true" modifier="large" class="button-margin" enabled>Submit</ons-button>
               </section>
 
 
 
               <script>
-                function pad(num, size) {
-                    num = num.toString();
-                    while (num.length < size) num = "0" + num;
-                    return num;
-                }
-
+                // function pad(num, size) {
+                //     num = num.toString();
+                //     while (num.length < size) num = "0" + num;
+                //     return num;
+                // }
                 function init(cardId){
-                  let card = globals.cardHolder.creditCards.find(c => c.cardId === pad(cardId,4));
+                  let card = globals.cardHolder.creditCards.find(c => c.cardId === cardId );
                   document.getElementById('cardName').innerHTML = card.cardName;
                   document.getElementById('cardNumber').innerHTML = card.maskedCardNumber;
                   document.getElementById('card-comment').value = card.cardComment;
@@ -246,6 +295,16 @@
                         inputItems[i].setAttribute('modifier', 'nodivider');
                     }
                   }
+
+                  document.getElementById('submit-btn').addEventListener('click', function (event) {
+                    status = updateCreditCard(card)
+                    if (status) {
+                      alert("Update Sucessful");
+                    } else {
+                      alert("Sorry it appears we encoutered an issue updating your card.");
+                    }
+                  });
+
                   document.getElementById('onOff-switch').addEventListener('change', function (event) {
                     if (card.cardOnOff) {
                       document.getElementById('onOff-status').innerHTML = `&nbsp;(off)`;
@@ -283,11 +342,10 @@
           </ons-page>
       </template>
       
-
       <style>
-        ons-splitter-side[animation=overlay] {
+        /* ons-splitter-side[animation=overlay] {
           border-left: 1px solid #bbb;
-        }
+        } */
       </style>
 </body>
 </html>
