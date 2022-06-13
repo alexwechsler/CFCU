@@ -2,7 +2,7 @@
 
 Hello & Welcome,
 
-This is a small project where the objective is to write a Mobile App which utilizes REST from the back end to communicate with a third party API to get & post data. The backend uses GraphQL and an MVC design pattern in order to send data to the FE and store updates within memory. In addition to MVS the project has a service class which acts as a facade to the underlying CRUD repository. You may test this by simply making updates to a CreditCard and then closing the browser window and/or opening a second window. When you come back to the home page and/or close & re-open you will notice that the updates have remained. 
+This is a small project where the objective is to write a Mobile App which utilizes REST from the back end to communicate with a third party API to get & post data. The backend uses GraphQL and an MVC design pattern in order to send data to the FE and store updates within memory. In addition to MVC the project has a service class which acts as a facade to the underlying CRUD repository. You may test this by simply making updates to a CreditCard and then closing the browser window and/or opening a second window. When you come back to the home page and/or close & re-open you will notice that the updates have remained. 
 
 In order to execute this project please use gradle...
   - ./gradlew bootRun
