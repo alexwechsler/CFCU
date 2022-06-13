@@ -43,8 +43,9 @@ public class CreditCardService {
         return repository.save(copy);
     }
 
-    // Dont' like this, but don't have another method to do a 
-    // findBy using a different field...
+    // Not efficient, the repo doesn't provide a lookup
+    // by other fields. Ok for such a small project but I would
+    // use a hashmap if this had millions of records. 
     public List<CreditCard> findByCardHolder(Long id) {
         List<CreditCard> cards = findAll();
         CreditCard[] cardArray = cards.toArray(new CreditCard[0]);

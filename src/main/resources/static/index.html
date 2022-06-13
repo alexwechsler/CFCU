@@ -8,7 +8,6 @@
     <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
-<!-- onpageshow="getCardHolder()" -->
 <body>
     <script>
 
@@ -70,10 +69,7 @@
 
         function setupCardHolder(cardHolder) {
             document.getElementById('welcome').innerHTML = "<h2>Welcome To CFCU <BR>" + cardHolder.name + "</h2><br><br>";
-            // card_area = document.getElementById('card_area');
             cardHolder.creditCards.forEach(createCreditCard);
-            // var cards = cardHolder.creditCards;
-            // cards.forEach(createCreditCard);
         }
 
         function createCreditCard(card) {
@@ -94,19 +90,13 @@
            html += "overflow: auto;";
            html +="}</style>";
            card_area.innerHTML = html;
-           // card_area.innerHTML.style.backgroundcolor = "#62c468";
         }
 
         window.fn = {};
-        
-        // window.fn.toggleMenu = function () {
-        // document.getElementById('appSplitter').right.toggle();
-        // };
 
         window.fn.loadView = function (index) {
         document.getElementById('appTabbar').setActiveTab(index);
         
-        // document.getElementById('sidemenu').close();
         };
 
         window.fn.loadLink = function (url) {
@@ -125,14 +115,11 @@
     <ons-navigator id="appNavigator" swipeable swipe-target-width="80px">
         <ons-page>
           <ons-splitter id="appSplitter">
-            <!-- <ons-splitter-side id="sidemenu" page="sidemenu.html" swipeable side="right" collapse="" width="260px"></ons-splitter-side> -->
             <ons-splitter-content page="tabbar.html"></ons-splitter-content>
           </ons-splitter>
         </ons-page>
       </ons-navigator>
       
-      <!-- <p class="intro" id="welcome"></p> -->
-
       <template id="tabbar.html">
         <ons-page id="tabbar-page">
           <ons-toolbar>
@@ -181,12 +168,9 @@
           </style>
           <script>
             getCardHolder()
-            // setupCardHolder(globals.cardHolder);
           </script>
         </ons-page>
       </template>
-
-      <!-- <template id="sidemenu.html"></template>       -->
 
       <template id="cardInfo.html">
           <ons-page id="cardInfo-page">
@@ -198,7 +182,6 @@
               </ons-toolbar>
 
               <div class="card">
-                <!-- <img src="img_avatar.png" alt="Avatar" style="width:100%"> -->
                 <div class="container">
                   <h4 id="cardName"><b>Card Name</b></h4>
                   <div id="cardNumber">
@@ -255,11 +238,6 @@
 
 
               <script>
-                // function pad(num, size) {
-                //     num = num.toString();
-                //     while (num.length < size) num = "0" + num;
-                //     return num;
-                // }
                 function init(cardId){
                   let card = globals.cardHolder.creditCards.find(c => c.cardId === cardId );
                   document.getElementById('cardName').innerHTML = card.cardName;

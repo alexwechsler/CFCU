@@ -29,7 +29,6 @@ public class CardHolder {
         this.name = name;
         this.cardService = cardService;
         this.setCreditCards(creditCards);
-        // this.creditCards = Arrays.asList(creditCards);
     }
 
     public void setName(String name) {
@@ -64,7 +63,6 @@ public class CardHolder {
     public CreditCard[] getCreditCards() {
         List<CreditCard> creditCards = cardService.findByCardHolder((long) this.getId());
         return creditCards.toArray(new CreditCard[0]);
-        // return this.creditCards.toArray(new CreditCard[0]);
     }
 
     public CardHolder updateWith(CardHolder cardholder) {

@@ -2,10 +2,8 @@
 type Query {
     CardHolder(id: Int): CardHolder
 }
-#     AllCardHolders: [CardHolder]
 
 # The Root Mutation for the application
 type Mutation {
     updateCreditCard(id: Int, name: String, number: String, status: String, comment: String, onOff: Boolean): Boolean!
-    # updateCreditCard(input: CreditCardInput): CreditCard!
 }
