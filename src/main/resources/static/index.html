@@ -8,7 +8,8 @@
     <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
-<body onload="getCardHolder()">
+<!-- onpageshow="getCardHolder()" -->
+<body>
     <script>
 
         var globals = {};
@@ -32,11 +33,10 @@
             };
 
             $.ajax(settings).done(function (response) {
-                globals.cardHolder = response.data.CardHolder;
-                // setupCardHolder();
+                var cardHolder = response.data.CardHolder;
+                globals.cardHolder = cardHolder;
+                setupCardHolder(cardHolder);
                 console.log(response);
-            }).fail(function (response) {
-                globals.cardHolder = response.data.CardHolder;
             });
         }
 
@@ -68,19 +68,12 @@
         });
         }
 
-        function setupCardHolder() {
-          // Doing this to handle a race condition where the 
-          // GQL occurs prior to completely rendering the page...
-            if (globals.cardHolder == null) {
-              // console.log("RACE CONDITION... HELP");
-              location.reload();
-              // try again
-            }
-            let user =  globals.cardHolder.name;
-            document.getElementById('welcome').innerHTML = "<h2>Welcome To CFCU " + user + "</h2><br><br>";
-            card_area = document.getElementById('card_area');
-            let cards = globals.cardHolder.creditCards;
-            cards.forEach(createCreditCard);
+        function setupCardHolder(cardHolder) {
+            document.getElementById('welcome').innerHTML = "<h2>Welcome To CFCU <BR>" + cardHolder.name + "</h2><br><br>";
+            // card_area = document.getElementById('card_area');
+            cardHolder.creditCards.forEach(createCreditCard);
+            // var cards = cardHolder.creditCards;
+            // cards.forEach(createCreditCard);
         }
 
         function createCreditCard(card) {
@@ -93,10 +86,12 @@
            html += "</ons-card>";
            html += "</div>";
            html += "<style>.card {background-image: url(cfcu_card2.jpg);";
-           html += "display:block;";
+           html += "display: inline-block;";
            html += "background-size: cover;";
            html += "height: 200px;";
-           html += "width 400px;";
+           html += "width: 1200px;";
+           html += "max-height:100%; max-width:100%;";
+           html += "overflow: auto;";
            html +="}</style>";
            card_area.innerHTML = html;
            // card_area.innerHTML.style.backgroundcolor = "#62c468";
@@ -185,7 +180,8 @@
             }
           </style>
           <script>
-             setupCardHolder();
+            getCardHolder()
+            // setupCardHolder(globals.cardHolder);
           </script>
         </ons-page>
       </template>
