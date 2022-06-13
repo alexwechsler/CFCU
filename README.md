@@ -21,6 +21,8 @@ Tech Stack
   - JQuery 
   - CSS
 
+The app is best viewed emulating a Mobile device...
+
 <BR><BR>
 Single Page Application - Screenshot shows opening view with users Credit Cards 
 ![Screenshot from 2022-06-13 01-28-05](https://user-images.githubusercontent.com/73296833/173341154-34097d39-bc90-485f-8471-9fa5032d3f4f.png)
